@@ -1,0 +1,50 @@
+name:                break-unagi-chan
+version:             0.1.0.0
+github:              "githubuser/break-unagi-chan"
+license:             BSD3
+author:              "Chris Allen"
+maintainer:          "cma@bitemyapp.com"
+copyright:           "2018 Chris Allen"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/githubuser/break-unagi-chan#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- async
+- unagi-chan
+
+library:
+  source-dirs: src
+
+executables:
+  break-unagi-chan-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - break-unagi-chan
+
+tests:
+  break-unagi-chan-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - break-unagi-chan
