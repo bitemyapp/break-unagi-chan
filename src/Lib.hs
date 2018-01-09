@@ -23,18 +23,44 @@ checkContents xs =
             )
   0 xs
 
+-- calc :: IO Integer
+-- calc =
+--   evaluate $ 10000000000 + 10000000000
+
 testRun :: IO ()
 testRun = do
   (inChan, outChan) <- newChan 100000
   fillChan inChan
   xsRef <- newIORef []
+  -- forM_ [1..10000] $ \i -> do
+  --   let n = floor $ 10000 / i
+  --   result <- race (readChan outChan) (threadDelay n)
+  --   case result of
+  --     (Left val) ->
+  --       modifyIORef' xsRef (val : )
+  --     (Right _) ->
+  --       putStrLn $ "delayed on " <> show i
+
+  -- exception handling variant --
+  let handler getter = do
+        val <- getter
+        writeChan inChan val
   forM_ [1..10000] $ \i -> do
     let n = floor $ 10000 / i
-    result <- race (readChan outChan) (threadDelay n)
+    result <- race (readChanOnException outChan handler) (threadDelay n)
     case result of
-      (Left val) -> modifyIORef' xsRef (val : )
-      (Right _) -> putStrLn "delayed!"
+      (Left val) ->
+        modifyIORef' xsRef (val : )
+      (Right _) ->
+        putStrLn $ "delayed on " <> show i
   list <- readIORef xsRef
   print $ length list
   final <- checkContents (reverse list)
   print final
+  -- finalContents <- getChanContents outChan
+  -- print finalContents
+  chanLength <- estimatedLength inChan
+  print chanLength
+  (elem, _) <- tryReadChan outChan
+  maybeVal <- tryRead elem
+  print maybeVal
