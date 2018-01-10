@@ -67,6 +67,8 @@ Much of the time, I got this benign result:
 Nothing
 ```
 
+## tryReadChan
+
 I didn't get a proper sample, but I seemed to get similarly fast and reliable results from a variation suggested by the creator of unagi-chan:
 
 ```haskell
@@ -101,3 +103,5 @@ readSegIxUnmasked h = \(seg,segIx)-> do
   -- N.B. must use `readMVar` here to support `dupChan`:
   where readBlocking v = inline h $ readMVar v 
 ```
+
+I am unclear on what makes this (async?) exception safe.
