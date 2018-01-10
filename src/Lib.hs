@@ -8,6 +8,7 @@ import Control.Monad
 import Data.Foldable
 import Data.IORef
 import Data.Monoid
+import System.Timeout
 
 fillChan :: InChan Int -> IO ()
 fillChan inChan = writeList2Chan inChan [1..10000]
@@ -47,12 +48,19 @@ testRun = do
         writeChan inChan val
   forM_ [1..10000] $ \i -> do
     let n = floor $ 10000 / i
-    result <- race (readChanOnException outChan handler) (threadDelay n)
+    -- result <- race (readChanOnException outChan handler) (threadDelay n)
+    -- case result of
+    --   (Left val) ->
+    --     modifyIORef' xsRef (val : )
+    --   (Right _) ->
+    --     putStrLn $ "delayed on " <> show i
+    result <- timeout n (readChan outChan)
     case result of
-      (Left val) ->
+      (Just val) ->
         modifyIORef' xsRef (val : )
-      (Right _) ->
+      Nothing ->
         putStrLn $ "delayed on " <> show i
+
   list <- readIORef xsRef
   print $ length list
   final <- checkContents (reverse list)
