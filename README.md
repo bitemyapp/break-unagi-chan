@@ -75,3 +75,29 @@ I didn't get a proper sample, but I seemed to get similarly fast and reliable re
 ```
 
 However I did get a detected skip.
+
+This appears to defer to the following code:
+
+```haskell
+-- The core of our 'read' operations, with exception handler:
+readSegIxUnmasked :: (IO a -> IO a) -> (StreamSegment a, Int) -> IO a
+{-# INLINE readSegIxUnmasked #-}
+readSegIxUnmasked h = \(seg,segIx)-> do
+    cellTkt <- readArrayElem seg segIx
+    case peekTicket cellTkt of
+         Written a -> return a
+         Empty -> do
+            v <- newEmptyMVar
+            (success,elseWrittenCell) <- casArrayElem seg segIx cellTkt (Blocking v)
+            if success 
+              then readBlocking v
+              else case peekTicket elseWrittenCell of
+                        -- In the meantime a writer has written. Good!
+                        Written a -> return a
+                        -- ...or a dupChan reader initiated blocking:
+                        Blocking v2 -> readBlocking v2
+                        _ -> error "Impossible! Expecting Written or Blocking"
+         Blocking v -> readBlocking v
+  -- N.B. must use `readMVar` here to support `dupChan`:
+  where readBlocking v = inline h $ readMVar v 
+```
