@@ -54,7 +54,8 @@ testRun = do
     --     modifyIORef' xsRef (val : )
     --   (Right _) ->
     --     putStrLn $ "delayed on " <> show i
-    result <- timeout n (readChan outChan)
+    -- result <- timeout n (readChan outChan)
+    result <- timeout n (readChanOnException outChan handler)
     case result of
       (Just val) ->
         modifyIORef' xsRef (val : )
