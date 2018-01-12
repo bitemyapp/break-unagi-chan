@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a9bb9b78b8df41bba8ef1a277602225807dd53aca50012a1041c43a31eba9b42
+-- hash: 182fb2590503555163ec2e8252bf9fa6eb2b9f5ce79ae88f97f59799ef70fe0e
 
 name:           break-unagi-chan
 version:        0.1.0.0
@@ -31,6 +31,7 @@ library
   build-depends:
       async
     , base >=4.7 && <5
+    , mwc-random
     , unagi-chan
   exposed-modules:
       Lib
@@ -47,6 +48,7 @@ executable break-unagi-chan-exe
       async
     , base >=4.7 && <5
     , break-unagi-chan
+    , mwc-random
     , unagi-chan
   other-modules:
       Paths_break_unagi_chan
@@ -62,6 +64,7 @@ test-suite break-unagi-chan-test
       async
     , base >=4.7 && <5
     , break-unagi-chan
+    , mwc-random
     , unagi-chan
   other-modules:
       Paths_break_unagi_chan
