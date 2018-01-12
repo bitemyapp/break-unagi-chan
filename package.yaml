@@ -24,6 +24,7 @@ dependencies:
 - async
 - unagi-chan
 - mwc-random
+- containers
 
 library:
   source-dirs: src
