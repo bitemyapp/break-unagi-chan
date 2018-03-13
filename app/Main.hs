@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 module Main where
 
--- import Lib
+import Lib
 import           Control.Concurrent
 import           Control.Concurrent.Async
 import           Control.Concurrent.Chan.Unagi.Bounded as UB
@@ -18,22 +18,22 @@ import           System.Random.MWC
 import           System.Timeout
 
 main :: IO ()
-main = do
-  args <- getArgs
-  case args of
-    [giveUp, chanSize, iterationsS] -> do
-      let iterations = read iterationsS
-      seen <- fuzzTest (read giveUp) (read chanSize) iterations safeAlgo
-      case countMismatches iterations seen of
-        0 -> putStrLn "Success!"
-        mismatches -> do
-          bail ("Found " <> show mismatches <> " mismatches")
-    _ -> usage
-  where
-    usage = bail "ARGS: giveUp (microseconds) chanSize iterations, e.g. 500000 10000 100"
-    bail msg = do
-      hPutStrLn stderr msg
-      exitFailure
+main = testRun
+  -- args <- getArgs
+  -- case args of
+  --   [giveUp, chanSize, iterationsS] -> do
+  --     let iterations = read iterationsS
+  --     seen <- fuzzTest (read giveUp) (read chanSize) iterations safeAlgo
+  --     case countMismatches iterations seen of
+  --       0 -> putStrLn "Success!"
+  --       mismatches -> do
+  --         bail ("Found " <> show mismatches <> " mismatches")
+  --   _ -> usage
+  -- where
+  --   usage = bail "ARGS: giveUp (microseconds) chanSize iterations, e.g. 500000 10000 100"
+  --   bail msg = do
+  --     hPutStrLn stderr msg
+  --     exitFailure
 
 
 -- | Blockingly reads the chan
