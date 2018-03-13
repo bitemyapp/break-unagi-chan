@@ -3,6 +3,7 @@ module Lib where
 import Control.Concurrent (threadDelay)
 import Control.Concurrent.Async
 import Control.Concurrent.Chan.Unagi.Bounded
+import qualified Control.Concurrent.MVar as MV
 import Control.Exception
 import Control.Monad
 import Data.Foldable
@@ -29,7 +30,16 @@ checkContents xs =
 --   evaluate $ 10000000000 + 10000000000
 
 -- testRun :: IO ()
--- testRun = undefined
+-- testRun = do
+--   -- mv <- MV.newEmptyMVar
+--   -- timeout 5 (MV.takeMVar mv)
+--   -- timeout 5 (uninterruptibleMask_ $ MV.takeMVar mv)
+--   -- timeout 5 (uninterruptibleMask_ $ threadDelay 100000000000000000)
+--   (_, outChan) <- newChan 100000
+--   -- timeout 5 (uninterruptibleMask_ $ readChan outChan)
+--   (_, blockForValue) <- tryReadChan outChan
+--   result <- timeout 5 (uninterruptibleMask_ $ blockForValue)
+--   putStrLn "we LIVE!"
 
 testRun :: IO ()
 testRun = do
@@ -53,14 +63,14 @@ testRun = do
   forM_ [1..10000] $ \i -> do
     let n = floor $ 10000 / i
     result <- race
-              -- (readChan outChan)
+              (readChan outChan)
               -- (mask_ $ readChan outChan)
               -- (uninterruptibleMask $ \_ -> readChan outChan)
-              (do
-                  -- when (i == 5000) $ getMaskingState >>= print
-                  (uninterruptibleMask_ $ do
-                      when (i == 5000) $ getMaskingState >>= print
-                      readChan outChan))
+              -- (do
+              --     -- when (i == 5000) $ getMaskingState >>= print
+              --     (uninterruptibleMask_ $ do
+              --         when (i == 5000) $ getMaskingState >>= print
+              --         readChan outChan))
               -- ((getMaskingState >>= print) >> (uninterruptibleMask_ $ print <$> getMaskingState >> readChan outChan))
               (threadDelay n)
     case result of
@@ -84,8 +94,8 @@ testRun = do
   print final
   -- finalContents <- getChanContents outChan
   -- print finalContents
-  chanLength <- estimatedLength inChan
-  print chanLength
-  (elem, _) <- tryReadChan outChan
-  maybeVal <- tryRead elem
-  print maybeVal
+  -- chanLength <- estimatedLength inChan
+  -- print chanLength
+  -- (elem, _) <- tryReadChan outChan
+  -- maybeVal <- tryRead elem
+  -- print maybeVal

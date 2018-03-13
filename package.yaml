@@ -25,6 +25,7 @@ dependencies:
 - unagi-chan
 - mwc-random
 - containers
+- semigroups
 
 library:
   source-dirs: src

@@ -1,4 +1,11 @@
 resolver: lts-10.8
+# compiler: ghc-7.10.3
+# We get a lot more skips/delays with 7.10.3
+
+compiler: ghc-8.0.2
 
 packages:
 - .
+
+extra-deps:
+  - unagi-chan-0.4.1.0
