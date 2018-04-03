@@ -62,31 +62,34 @@ testRun = do
   getMaskingState >>= print
   forM_ [1..10000] $ \i -> do
     let n = floor $ 10000 / i
-    result <- race
-              (readChan outChan)
-              -- (mask_ $ readChan outChan)
-              -- (uninterruptibleMask $ \_ -> readChan outChan)
-              -- (do
-              --     -- when (i == 5000) $ getMaskingState >>= print
-              --     (uninterruptibleMask_ $ do
-              --         when (i == 5000) $ getMaskingState >>= print
-              --         readChan outChan))
-              -- ((getMaskingState >>= print) >> (uninterruptibleMask_ $ print <$> getMaskingState >> readChan outChan))
-              (threadDelay n)
-    case result of
-      (Left val) ->
-        modifyIORef' xsRef (val : )
-      (Right _) ->
-        putStrLn $ "delayed on " <> show i
+    -- result <- race
+    --           (readChan outChan)
+    --           -- (mask_ $ readChan outChan)
+    --           -- (uninterruptibleMask $ \_ -> readChan outChan)
+    --           -- (do
+    --           --     -- when (i == 5000) $ getMaskingState >>= print
+    --           --     (uninterruptibleMask_ $ do
+    --           --         when (i == 5000) $ getMaskingState >>= print
+    --           --         readChan outChan))
+    --           -- ((getMaskingState >>= print) >> (uninterruptibleMask_ $ print <$> getMaskingState >> readChan outChan))
+    --           (threadDelay n)
+    -- case result of
+    --   (Left val) ->
+    --     modifyIORef' xsRef (val : )
+    --   (Right _) ->
+    --     putStrLn $ "delayed on " <> show i
     -- result <- timeout n (readChan outChan)
     -- result <- timeout n (readChanOnException outChan handler)
-    -- (_, blockForValue) <- tryReadChan outChan
-    -- result <- timeout n blockForValue
-    -- case result of
-    --   (Just val) ->
-    --     modifyIORef' xsRef (val : )
-    --   Nothing ->
-    --     putStrLn $ "delayed on " <> show i
+    (_, bfv) <- tryReadChan outChan
+    let blockForValue = uninterruptibleMask_ $ do
+          -- (getMaskingState >>= print)
+          bfv
+    result <- timeout n blockForValue
+    case result of
+      (Just val) ->
+        modifyIORef' xsRef (val : )
+      Nothing ->
+        putStrLn $ "delayed on " <> show i
 
   list <- readIORef xsRef
   print $ length list

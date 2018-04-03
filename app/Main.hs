@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 module Main where
 
-import Lib
+import           Lib
 import           Control.Concurrent
 import           Control.Concurrent.Async
 import           Control.Concurrent.Chan.Unagi.Bounded as UB
